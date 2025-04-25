@@ -1,0 +1,83 @@
+// src/config/firestore.rules
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Articles collection
+    match /articles/{articleId} {
+      // Public read access
+      allow read: if true;
+      
+      // Only authenticated users can write
+      allow write: if request.auth != null;
+      
+      // Validate article data
+      allow create: if request.auth != null &&
+                    request.resource.data.title is string &&
+                    request.resource.data.source is string &&
+                    request.resource.data.link is string &&
+                    request.resource.data.timestamp is timestamp &&
+                    request.resource.data.isCrimeRelated is bool &&
+                    request.resource.data.createdAt is timestamp &&
+                    request.resource.data.updatedAt is timestamp;
+                    
+      // Only allow updates to specific fields
+      allow update: if request.auth != null &&
+                    request.resource.data.keys().hasOnly([
+                      'title', 
+                      'description', 
+                      'category', 
+                      'metadata', 
+                      'updatedAt'
+                    ]) &&
+                    request.resource.data.updatedAt is timestamp;
+    }
+    
+    // Sources collection
+    match /sources/{sourceId} {
+      // Public read access
+      allow read: if true;
+      
+      // Only authenticated users can write
+      allow write: if request.auth != null;
+      
+      // Validate source data
+      allow create: if request.auth != null &&
+                    request.resource.data.name is string &&
+                    request.resource.data.url is string &&
+                    request.resource.data.category is string &&
+                    request.resource.data.createdAt is timestamp;
+    }
+    
+    // Statistics collection
+    match /statistics/{statId} {
+      // Public read access
+      allow read: if true;
+      
+      // Only authenticated users can write
+      allow write: if request.auth != null;
+    }
+    
+    // Global security rules
+    function isTimestamp(value) {
+      return value is timestamp;
+    }
+    
+    function isString(value) {
+      return value is string;
+    }
+    
+    function isValidArticle(article) {
+      return isString(article.title) &&
+             isString(article.source) &&
+             isString(article.link) &&
+             isTimestamp(article.timestamp) &&
+             article.isCrimeRelated is bool;
+    }
+    
+    function isValidSource(source) {
+      return isString(source.name) &&
+             isString(source.url) &&
+             isString(source.category);
+    }
+  }
+}

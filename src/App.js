@@ -1,22 +1,30 @@
-import { BrowserRouter as Router, Routes, Route, Link, Navigate } from 'react-router-dom';
-import { useState } from 'react';
+// src/App.js
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import SourcesTable from './components/SourcesTable';
 import './App.css';
 
 function App() {
   return (
     <Router>
-      <div className="app-container">
-        <nav className="navbar">
-          <h2>Trading App</h2>
-          <ul className="nav-links">
-            <li><Link to="/">Home</Link></li>
-            <li><Link to="/login">Login</Link></li>
+      <div className="App">
+        <nav>
+          <ul>
+            <li>
+              <Link to="/sources">Sources</Link>
+            </li>
+            <li>
+              <Link to="/articles">Articles</Link>
+            </li>
+            <li>
+              <Link to="/statistics">Statistics</Link>
+            </li>
           </ul>
         </nav>
-        
+
         <Routes>
-          <Route path="/" element={<div>Home Page</div>} />
-          <Route path="/login" element={<div>Login Page</div>} />
+          <Route path="/sources" element={<SourcesTable />} />
+          {/* Add other routes here */}
         </Routes>
       </div>
     </Router>
